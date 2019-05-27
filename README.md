@@ -1,8 +1,6 @@
 # Habu
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/habu`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+DI container
 
 ## Installation
 
@@ -20,9 +18,55 @@ Or install it yourself as:
 
     $ gem install habu
 
+If you are using Rails, add this line to `config/boot.rb` immediately after `require 'bundler/setup'`.
+
+    require 'habu/setup'
+
+If you are not using Rails, add this line before using DI container.
+
+    require 'habu/setup'
+
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+# new_user_service.rb
+class NewUserService
+  @Inject
+  def initialize(user_repository)
+    @user_repository = user_repository
+  end
+
+  def call
+    @user_repository.new
+  end
+end
+
+# app.rb
+require 'habu/setup'
+require 'habu/container'
+require 'user'
+require 'new_user_service'
+
+# Create a new container
+container = Habu::Container.new
+
+# Register user_repository service by passing the block as service factory
+container[:user_repository] { User }
+
+# Call Habu::Container#new to get instance
+new_user = container.new(NewUserService).call
+
+# Factory block take a container as argument
+container[:new_user] do |c|
+  # You can get the service object by calling Container#[](service_name)
+  NewUserService.new(container[:user_repository]).call
+end
+new_user = container[:new_user]
+
+# Using container as refinements for shorthand for container.new
+using container.to_refinements
+new_user = NewUserService.new.call
+```
 
 ## Development
 
@@ -32,4 +76,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/habu.
+Bug reports and pull requests are welcome on GitHub at https://github.com/hanachin/habu.
