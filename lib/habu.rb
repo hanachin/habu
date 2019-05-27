@@ -1,6 +1,6 @@
 require "habu/version"
+require "habu/container"
 
 module Habu
   class Error < StandardError; end
-  # Your code goes here...
 end
