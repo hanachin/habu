@@ -1,3 +1,5 @@
+require 'habu'
+
 module Habu
   module Setup
     class << self
