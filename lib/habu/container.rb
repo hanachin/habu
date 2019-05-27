@@ -18,8 +18,8 @@ module Habu
     end
 
     def to_refinements
-      @refinements = Module.new
-      @refinements.instance_exec(self) do |container|
+      refinements = Module.new
+      refinements.instance_exec(self) do |container|
         Habu.annotation_collector.constructor_annotations.each do |klass_name|
           klass = const_get(klass_name)
           refine(klass.singleton_class) do
@@ -29,7 +29,7 @@ module Habu
           end
         end
       end
-      @refinements
+      refinements
     end
   end
 end
