@@ -29,6 +29,9 @@ If you are not using Rails, add this line before using DI container.
 ## Usage
 
 ```ruby
+# user.rb
+User = Struct.new(:name)
+
 # new_user_service.rb
 class NewUserService
   @Inject
@@ -36,16 +39,16 @@ class NewUserService
     @user_repository = user_repository
   end
 
-  def call
-    @user_repository.new
+  def call(*params)
+    @user_repository.new(*params)
   end
 end
 
 # app.rb
 require 'habu/setup'
 require 'habu/container'
-require 'user'
-require 'new_user_service'
+require_relative 'user'
+require_relative 'new_user_service'
 
 # Create a new container
 container = Habu::Container.new
@@ -54,18 +57,21 @@ container = Habu::Container.new
 container[:user_repository] { User }
 
 # Call Habu::Container#new to get instance
-new_user = container.new(NewUserService).call
+new_user = container.new(NewUserService).call("hanachin")
+# => #<struct User name="hanachin">
 
 # Factory block take a container as argument
 container[:new_user] do |c|
   # You can get the service object by calling Container#[](service_name)
-  NewUserService.new(container[:user_repository]).call
+  NewUserService.new(c[:user_repository])
 end
-new_user = container[:new_user]
+new_user = container[:new_user].call("hanachin")
+# => #<struct User name="hanachin">
 
 # Using container as refinements for shorthand for container.new
 using container.to_refinements
-new_user = NewUserService.new.call
+new_user = NewUserService.new.call("hanachin")
+# => #<struct User name="hanachin">
 ```
 
 ## Development
