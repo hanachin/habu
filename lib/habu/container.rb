@@ -8,7 +8,7 @@ module Habu
       if block
         @factories[key] = block
       else
-        @factories.fetch(key).call
+        @factories.fetch(key).call(self)
       end
     end
   end
