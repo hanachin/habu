@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'habu/setup'
 
 RSpec.describe Habu::Container do
   describe '#[]' do
@@ -34,6 +35,28 @@ RSpec.describe Habu::Container do
       api_client = container.new(ApiClient)
       expect(api_client.api_key).to eq('secret')
       expect(api_client.host).to eq('example.com')
+    end
+  end
+
+  load 'app/user_repository.rb'
+  load 'app/user_service.rb'
+
+  describe '#to_refinements' do
+    container = described_class.new
+    using container.to_refinements
+
+    it 'raise error if dependent object is not found' do
+      expect { UserService.new }.to raise_error(KeyError, /key not found: :user_repository/)
+    end
+  end
+
+  describe '#to_refinements' do
+    container = described_class.new
+    container[:user_repository] { UserRepository }
+    using container.to_refinements
+
+    it 'refines .new by constructor injection' do
+      expect { UserService.new }.not_to raise_error
     end
   end
 end
