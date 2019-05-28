@@ -1,5 +1,4 @@
 require 'habu/setup'
-require 'habu/container'
 require_relative 'user'
 require_relative 'new_user_service'
 
