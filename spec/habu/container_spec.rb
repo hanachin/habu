@@ -18,6 +18,24 @@ RSpec.describe Habu::Container do
     end
   end
 
+  describe '#factories'do
+    great_service = 'great service'
+    container = described_class.new
+    container[:great_service] { great_service }
+
+    it 'define service as factory method' do
+      expect(container.factories.great_service).to eq('great service')
+    end
+
+    describe '#to_refinements' do
+      using container.factories.to_refinements
+
+      it 'refines Object to access service' do
+        expect(self.great_service).to eq('great service')
+      end
+    end
+  end
+
   describe '#new' do
     class ApiClient
       attr_reader :api_key, :host

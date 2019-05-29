@@ -1,12 +1,30 @@
 module Habu
   class Container
+    attr_reader :factories
+
     def initialize
       @factories = {}
+      @factories.define_singleton_method(:to_refinements) do
+        factory_methods = singleton_methods.map(&self.:singleton_method)
+        refinements = Module.new
+        refinements.instance_exec(self) do |container|
+          refine(Object) do
+            factory_methods.each do |m|
+              define_method(m.name, &m)
+            end
+          end
+        end
+        refinements
+      end
     end
 
     def [](key, &block)
       if block
         @factories[key] = block
+        container = self
+        @factories.define_singleton_method(key) do
+          block.call(container)
+        end
       else
         @factories.fetch(key).call(self)
       end
