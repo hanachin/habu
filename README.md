@@ -55,12 +55,12 @@ container = Habu::Container.new
 # Register user_repository service by passing the block as service factory
 container[:user_repository] { User }
 
-# You can access to registered service by calling the method of Container#factories
-container.factories.user_repository.new("hanachin")
+# You can access to registered service by calling the method of Container#factory
+container.factory.user_repository.new("hanachin")
 # => #<struct User name="hanachin">
 
-# Also you can use Container#factories as refinements for shorthand
-using container.factories.to_refinements
+# Also you can use Container#factory as refinements for shorthand
+using container.factory.to_refinements
 user_repository.new("hanachin")
 # => #<struct User name="hanachin">
 
