@@ -3,30 +3,14 @@ module Habu
     attr_reader :factory
 
     def initialize
-      @factory = {}
-      @factory.define_singleton_method(:to_refinements) do
-        factory_methods = singleton_methods.map(&self.:singleton_method)
-        refinements = Module.new
-        refinements.instance_exec(self) do |container|
-          refine(Object) do
-            factory_methods.each do |m|
-              define_method(m.name, &m)
-            end
-          end
-        end
-        refinements
-      end
+      @factory = Factory.new(self)
     end
 
     def [](key, &block)
       if block
-        @factory[key] = block
-        container = self
-        @factory.define_singleton_method(key) do
-          block.call(container)
-        end
+        @factory.register(key, &block)
       else
-        @factory.fetch(key).call(self)
+        @factory.resolve(key)
       end
     end
 
