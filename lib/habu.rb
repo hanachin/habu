@@ -1,6 +1,7 @@
 require "habu/version"
-require "habu/container"
 require "habu/annotation_collector"
+require "habu/container"
+require "habu/factory"
 
 module Habu
   class Error < StandardError; end
