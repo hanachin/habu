@@ -2,8 +2,12 @@ module Habu
   class Container
     attr_reader :factory
 
-    def initialize
-      @factory = Factory.new(self)
+    def initialize(
+          annotation_collector: Habu.annotation_collector,
+          factory: Factory.new(self)
+        )
+      @annotation_collector = annotation_collector
+      @factory = factory
     end
 
     def [](key, &block)
@@ -21,8 +25,8 @@ module Habu
 
     def to_refinements
       refinements = Module.new
-      refinements.instance_exec(self) do |container|
-        Habu.annotation_collector.constructor_annotations.each do |klass_name|
+      refinements.instance_exec(@annotation_collector, self) do |annotation_collector, container|
+        annotation_collector.constructor_annotations.each do |klass_name|
           klass = const_get(klass_name)
           refine(klass.singleton_class) do
             define_method(:new) do |&block|
